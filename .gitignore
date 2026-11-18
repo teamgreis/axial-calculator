@@ -1,0 +1,36 @@
+# ---------------------------------------------------------------- App / .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.db
+AppPackages/
+BundleArtifacts/
+*.appx
+*.msix
+*.cer
+*.pfx
+_pkginfo.txt
+*.snupkg
+
+# ---------------------------------------------------------------- C++ core
+build/
+out/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+compile_commands.json
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+
+# ---------------------------------------------------------------- node / misc
+node_modules/
+npm-debug.log*
+.DS_Store
+Thumbs.db

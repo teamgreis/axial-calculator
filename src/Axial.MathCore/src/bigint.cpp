@@ -291,8 +291,10 @@ std::string BigInt::toDecimal() const {
     std::vector<uint32_t> mag = mag_;
     std::string out;
     while (!mag.empty()) {
+        std::vector<uint32_t> q;
         uint32_t rem = 0;
-        divmodSmall(mag, kChunk, mag, rem);
+        divmodSmall(mag, kChunk, q, rem);   // q must not alias mag
+        mag.swap(q);
         char buf[16];
         std::snprintf(buf, sizeof(buf), "%09u", rem);
         if (out.empty()) {

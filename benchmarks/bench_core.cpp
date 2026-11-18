@@ -46,7 +46,7 @@ double nsPerOpCompiled(const char* src, int iters, const EvalOptions& opts) {
     for (int i = 0; i < iters; ++i) {
         AxialError e;
         vmRun(prog, env, out, e);
-        sink += e.ok ? out.toDouble() : 0.0;
+        sink += e.ok() ? out.toDouble() : 0.0;
     }
     auto t1 = Clock::now();
     (void)sink;

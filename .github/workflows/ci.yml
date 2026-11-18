@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  core:
+    name: Mathe-Kern (Build / Tests / Benchmark)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: CMake konfigurieren (Ninja + MSVC)
+        run: cmake -S src/Axial.MathCore -B build-core -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Bauen
+        run: cmake --build build-core
+
+      - name: Tests (CTest)
+        run: ctest --test-dir build-core --output-on-failure
+
+      - name: Benchmark
+        run: .\build-core\axial_bench.exe

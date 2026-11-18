@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "axial/axial_config.hpp"
 #include "axial/errors.hpp"
 #include "axial/json.hpp"
 #include "axial/parser.hpp"

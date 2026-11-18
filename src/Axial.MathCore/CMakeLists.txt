@@ -28,6 +28,7 @@ set(CORE_SOURCES
 
 add_library(axial_mathcore STATIC ${CORE_SOURCES})
 target_include_directories(axial_mathcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_definitions(axial_mathcore PUBLIC AXIAL_STATIC_BUILD)
 
 add_library(axial_mathcore_dll SHARED ${CORE_SOURCES})
 target_compile_definitions(axial_mathcore_dll PRIVATE AXIAL_BUILD_DLL)

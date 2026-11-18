@@ -7,7 +7,10 @@
 #define AXIAL_VERSION_STRING "0.1.0"
 
 // DLL export macro (Windows). On other platforms the macro is empty.
-#if defined(_WIN32) || defined(_WIN64)
+// AXIAL_STATIC_BUILD marks consumers of the static library.
+#if defined(AXIAL_STATIC_BUILD)
+  #define AXIAL_API
+#elif defined(_WIN32) || defined(_WIN64)
   #ifdef AXIAL_BUILD_DLL
     #define AXIAL_API __declspec(dllexport)
   #else

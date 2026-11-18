@@ -52,9 +52,6 @@ std::string formatDouble(double x) {
 static std::string formatComplex(const Value& v) {
     // Im-only form for pure imaginary: "2i"; otherwise "3 + 4i" / "3 − 4i".
     double re = v.re, im = v.im;
-    auto fmt = [](double d) {
-        return d == 0.0 ? std::string("0") : formatDouble(d);
-    };
     if (re == 0.0) {
         // -3i or 2i
         return (im < 0 ? "-" : "") + formatDouble(std::fabs(im)) + "i";

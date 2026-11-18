@@ -235,7 +235,7 @@ BigInt truncBig(const Rational& q) {
     return whole;
 }
 
-bool roundExact(const char* fn, const Slot& a, Slot& out, int pos, AxialError& e) {
+bool roundExact(const char* fn, const Slot& a, Slot& out) {
     const Rational& q = a.q;
     BigInt whole = truncBig(q);
     std::string msg;
@@ -298,7 +298,7 @@ bool callFunction(const std::string& fn, const std::vector<Slot>& args,
             return true;
         }
         if (fn == "trunc" || fn == "floor" || fn == "ceil" || fn == "round") {
-            return roundExact(fn.c_str(), args[0], out, pos, e);
+            return roundExact(fn.c_str(), args[0], out);
         }
         if (fn == "gcd" || fn == "lcm") {
             if (!args[0].q.isInteger() || !args[1].q.isInteger()) {
@@ -379,11 +379,7 @@ bool callFunction(const std::string& fn, const std::vector<Slot>& args,
         if (fn == "min" || fn == "max") {
             out = args[0];
             for (size_t i = 1; i < args.size(); ++i) {
-                int c = args[i].q.compare(args[0].q);
-                (void)c;
-                // compare current best with candidate
-                const Rational& best = out.q;
-                int cmp = args[i].q.compare(best);
+                int cmp = Rational::compare(args[i].q, out.q);
                 if ((fn == "min" && cmp < 0) || (fn == "max" && cmp > 0)) {
                     out = args[i];
                 }

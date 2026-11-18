@@ -45,7 +45,7 @@ target_include_directories(axial_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests
 
 option(BUILD_BENCH "Build the benchmark harness" ON)
 if(BUILD_BENCH)
-  add_executable(axial_bench benchmarks/bench_core.cpp)
+  add_executable(axial_bench ${CMAKE_CURRENT_SOURCE_DIR}/../../benchmarks/bench_core.cpp)
   target_link_libraries(axial_bench PRIVATE axial_mathcore)
 endif()
 

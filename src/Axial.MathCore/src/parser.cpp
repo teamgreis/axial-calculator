@@ -123,8 +123,8 @@ struct P {
                                 ++pos;
                             } else {
                                 fail(ErrorKind::Syntax, peek(),
-                                     "Schlie\xC3\x9Fende \")\" fehlt",
-                                     "Klammer schlie\xC3\x9Fen oder Ausdruck k\xC3\xBCrzen.");
+                                     "Schließende \")\" fehlt",
+                                     "Klammer schließen oder Ausdruck kürzen.");
                                 return nullptr;
                             }
                         }
@@ -165,11 +165,11 @@ struct P {
                 return nullptr;
             case Tok::RParen:
                 fail(ErrorKind::Syntax, t, "Unerwartetes Symbol: )",
-                     "Zu viele schlie\xC3\x9Fende Klammern.");
+                     "Zu viele schließende Klammern.");
                 return nullptr;
             case Tok::End:
                 fail(ErrorKind::Syntax, t, "Unerwartetes Ende des Ausdrucks",
-                     "Ausdruck vervollst\xC3\xA4ndigen.");
+                     "Ausdruck vervollständigen.");
                 return nullptr;
             case Tok::Comma:
                 fail(ErrorKind::Syntax, t, "Unerwartetes Komma");
@@ -351,14 +351,14 @@ ParseResult Parser::parse(const std::string& src) {
     if (rest.kind == Tok::RParen) {
         parser.fail(ErrorKind::Syntax, rest,
                     "Unerwartetes Symbol am Ende",
-                    "Zu viele schlie\xC3\x9Fende Klammern.");
+                    "Zu viele schließende Klammern.");
         res.err = parser.err;
         return res;
     }
     if (rest.kind != Tok::End) {
         parser.fail(ErrorKind::Syntax, rest,
                     "Unerwartetes Symbol am Ende",
-                    "Operator oder fehlende Zahl pr\xC3\xBCfen.");
+                    "Operator oder fehlende Zahl prüfen.");
         res.err = parser.err;
         return res;
     }

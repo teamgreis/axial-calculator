@@ -24,6 +24,9 @@ public:
     int  compare(const BigInt& o) const;      // -1 / 0 / 1
     bool operator==(const BigInt& o) const { return compare(o) == 0; }
     bool operator<(const BigInt& o) const { return compare(o) < 0; }
+    bool operator>(const BigInt& o) const { return compare(o) > 0; }
+    bool operator<=(const BigInt& o) const { return compare(o) <= 0; }
+    bool operator>=(const BigInt& o) const { return compare(o) >= 0; }
 
     BigInt operator-() const;
     BigInt operator+(const BigInt& o) const;

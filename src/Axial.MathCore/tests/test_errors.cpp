@@ -22,7 +22,7 @@ TEST(error_empty_input) {
 }
 
 TEST(error_unknown_token) {
-    EvalResult r = E("2 \xC2\xA7 3");
+    EvalResult r = E("2 § 3");
     CHECK(!r.ok);
     CHECK(r.err.kind == ErrorKind::UnknownToken);
     CHECK(r.err.pos == 2);
@@ -90,7 +90,7 @@ TEST(error_pow_negative_base_fractional) {
 }
 
 TEST(error_position_reported) {
-    EvalResult r = E("2+\xC2\xA74");
+    EvalResult r = E("2+§4");
     CHECK(!r.ok);
     CHECK(r.err.pos == 2);
 }

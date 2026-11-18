@@ -97,6 +97,13 @@ Rational Rational::add(const Rational& o) const {
 
 Rational Rational::sub(const Rational& o) const { return add(o.negated()); }
 
+int Rational::compare(const Rational& a, const Rational& b) {
+    // denominators are always positive: compare cross products
+    BigInt lhs = a.n * b.d;
+    BigInt rhs = b.n * a.d;
+    return lhs.compare(rhs);
+}
+
 Rational Rational::mul(const Rational& o) const {
     if (isZero() || o.isZero()) return zero();
     // cross-cancel to keep operands small

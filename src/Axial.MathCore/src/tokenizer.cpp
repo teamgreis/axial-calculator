@@ -115,7 +115,7 @@ bool Tokenizer::run(const std::string& src, std::vector<Token>& out,
                 err.kind = ErrorKind::UnknownToken;
                 err.pos = (int)i;
                 err.token = raw;
-                err.message = "Ung\xC3\xBCltige Zahl: " + raw;
+                err.message = "Ungültige Zahl: " + raw;
                 return false;
             }
             Token t;

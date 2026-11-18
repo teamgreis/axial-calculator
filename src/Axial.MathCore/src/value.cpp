@@ -10,7 +10,7 @@
 namespace axial {
 
 std::string formatDouble(double x) {
-    if (!std::isfinite(x)) return "\xE2\x88\x9E";  // ∞
+    if (!std::isfinite(x)) return "∞";  // ∞
     if (x == 0.0) return "0";
     if (std::floor(x) == x && std::fabs(x) < 1e15) {
         int64_t v = (int64_t)x;

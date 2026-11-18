@@ -92,13 +92,13 @@ bool opDiv(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
     if (a.exact && b.exact) {
         if (b.q.isZero()) {
             return fail(e, ErrorKind::DivideByZero, pos, "Division durch Null",
-                        "Nenner pr\xC3\xBCfen.");
+                        "Nenner prüfen.");
         }
         std::string msg;
         Rational r;
         if (!Rational::div(a.q, b.q, r, msg)) {
             return fail(e, ErrorKind::DivideByZero, pos, msg,
-                        "Nenner pr\xC3\xBCfen.");
+                        "Nenner prüfen.");
         }
         out = Slot::ExactQ(r);
         return true;
@@ -115,7 +115,7 @@ bool opPow(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
     if (a.exact && b.exact && b.q.isInteger()) {
         const BigInt& ex = b.q.num();
         if (ex < BigInt::fromInt64(-1000) || ex > BigInt::fromInt64(1000)) {
-            return fail(e, ErrorKind::Limit, pos, "Exponent zu gro\xC3\x9F",
+            return fail(e, ErrorKind::Limit, pos, "Exponent zu groß",
                         "Ganze Exponenten nur bis 1000.");
         }
         std::string msg;
@@ -148,12 +148,12 @@ bool opFact(const Slot& a, Slot& out, int pos, AxialError& e) {
         const BigInt& n = a.q.num();
         if (n.sign() < 0) {
             return fail(e, ErrorKind::Domain, pos,
-                        "Fakult\xC3\xA4t nur f\xC3\xBCr nicht-negative Ganzzahlen", hintMsg);
+                        "Fakultät nur für nicht-negative Ganzzahlen", hintMsg);
         }
         if (n > BigInt::fromInt64(10000)) {
             return fail(e, ErrorKind::Limit, pos,
-                        "Fakult\xC3\xA4t nur bis 10000 berechenbar",
-                        "Gr\xC3\xB6\xC3\x9Fere Werte mit N\xC3\xA4herung berechnen.");
+                        "Fakultät nur bis 10000 berechenbar",
+                        "Größere Werte mit Näherung berechnen.");
         }
         uint64_t k = (uint64_t)std::strtoull(n.toDecimal().c_str(), nullptr, 10);
         Rational acc = Rational::one();
@@ -164,7 +164,7 @@ bool opFact(const Slot& a, Slot& out, int pos, AxialError& e) {
         return true;
     }
     return fail(e, ErrorKind::Domain, pos,
-                "Fakult\xC3\xA4t nur f\xC3\xBCr nicht-negative Ganzzahlen", hintMsg);
+                "Fakultät nur für nicht-negative Ganzzahlen", hintMsg);
 }
 bool opPct(const Slot& a, Slot& out) {
     if (a.exact) {
@@ -220,7 +220,7 @@ bool requireFinite(double v, int pos, AxialError& e, const char* fn) {
     if (!std::isfinite(v)) {
         return fail(e, ErrorKind::Domain, pos,
                     std::string(fn) + ": Ergebnis nicht definiert",
-                    "Definitionsbereich pr\xC3\xBCfen.");
+                    "Definitionsbereich prüfen.");
     }
     return true;
 }
@@ -275,7 +275,7 @@ bool callFunction(const std::string& fn, const std::vector<Slot>& args,
         return fail(e, ErrorKind::Domain, pos,
                     fn + ": " + std::to_string(want) +
                         (want == 1 ? " Argument erwartet" : " Argumente erwartet"),
-                    "Funktionssignatur pr\xC3\xBCfen.");
+                    "Funktionssignatur prüfen.");
     }
     if (want < 0 && args.empty()) {
         return fail(e, ErrorKind::Domain, pos, fn + ": keine Argumente",
@@ -328,7 +328,7 @@ bool callFunction(const std::string& fn, const std::vector<Slot>& args,
                 BigInt::abs(args[1].q.num()).toDecimal().c_str(), nullptr, 10);
             if (r < 0 || n < 0 || r > n) {
                 return fail(e, ErrorKind::Domain, pos,
-                            std::string(fn) + ": 0 \xE2\x89\xA4 r \xE2\x89\xA4 n erwartet");
+                            std::string(fn) + ": 0 ≤ r ≤ n erwartet");
             }
             if (r > n - r) r = n - r;
             BigInt result = BigInt::fromInt64(1);
@@ -464,8 +464,8 @@ bool callFunction(const std::string& fn, const std::vector<Slot>& args,
         if (fn == "log" && args.size() >= 2) b = args[1].toD();
         if (x <= 0.0 || b <= 0.0 || b == 1.0) {
             return fail(e, ErrorKind::Domain, pos,
-                        std::string(fn) + ": nur f\xC3\xBCr positive Zahlen definiert",
-                        "Argument gr\xC3\xB6\xC3\x9Fer 0 w\xC3\xA4hlen.");
+                        std::string(fn) + ": nur für positive Zahlen definiert",
+                        "Argument größer 0 wählen.");
         }
         out = Slot::Real(std::log(x) / std::log(b));
         return true;
@@ -533,7 +533,7 @@ Slot foldConst(const Node& n, bool& folded) {
 struct C {
     Program& p;
     AxialError& err;
-    explicit C(Program& prog, AxialError& e) : p(prog), e(e) {}
+    explicit C(Program& prog, AxialError& e) : p(prog), err(e) {}
 
     int poolQ(const Rational& q) {
         // reuse pool entries: linear scan is fine for small pools

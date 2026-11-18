@@ -29,6 +29,10 @@ struct Rational {
         r.n = -r.n;
         return r;
     }
+    static int compare(const Rational& a, const Rational& b);
+    bool operator==(const Rational& o) const { return compare(*this, o) == 0; }
+    bool operator<(const Rational& o) const { return compare(*this, o) < 0; }
+
     bool isZero() const { return n.isZero(); }
     bool isInteger() const { return d == BigInt::fromInt64(1); }
     int sign() const { return n.sign(); }

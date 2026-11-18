@@ -48,12 +48,12 @@ struct JParser {
         if (c == 't' || c == 'f') {
             if (lit("true")) { out.kind = JsonValue::Bool; out.boolean = true; return true; }
             if (lit("false")) { out.kind = JsonValue::Bool; out.boolean = false; return true; }
-            die("Ung\xC3\xBCltiges Literal");
+            die("Ungültiges Literal");
             return false;
         }
         if (c == 'n') {
             if (lit("null")) { out.kind = JsonValue::Null; return true; }
-            die("Ung\xC3\xBCltiges Literal");
+            die("Ungültiges Literal");
             return false;
         }
         return parseNumber(out);
@@ -73,7 +73,7 @@ struct JParser {
             if (i < n && (s[i] == '-' || s[i] == '+')) ++i;
             while (i < n && s[i] >= '0' && s[i] <= '9') ++i;
         }
-        if (!digits) { die("Ung\xC3\xBCltige Zahl"); return false; }
+        if (!digits) { die("Ungültige Zahl"); return false; }
         std::string num(s + start, i - start);
         out.kind = JsonValue::Number;
         out.number = std::strtod(num.c_str(), nullptr);
@@ -167,7 +167,7 @@ struct JParser {
         for (;;) {
             skipWs();
             JsonValue key;
-            if (i >= n || s[i] != '"') { die("Objektschl\xC3\xBCssel erwartet"); return false; }
+            if (i >= n || s[i] != '"') { die("Objektschlüssel erwartet"); return false; }
             if (!parseString(key)) return false;
             skipWs();
             if (i >= n || s[i] != ':') { die("Erwartete ':' im Objekt"); return false; }

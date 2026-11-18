@@ -99,7 +99,7 @@ inline void checkClose(double got, double want, double eps, const char* file,
                 f += delta;                                               \
             }                                                             \
         }                                                                 \
-        std::printf("\n%d Pr\xC3\xBCfungen, %d Fehler\n",                 \
+        std::printf("\n%d Prüfungen, %d Fehler\n",                 \
                     axtest::checks(), axtest::failures());                \
         return f == 0 ? 0 : 1;                                            \
     }

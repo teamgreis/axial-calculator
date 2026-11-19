@@ -155,11 +155,11 @@ bool opDiv(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
     if (a.isExact() && b.isExact()) {
         if (b.kind == SK_INT && b.d == 0.0) {
             return fail(e, ErrorKind::DivideByZero, pos, "Division durch Null",
-                        "Nenner pr\xC3\xBCfen.");
+                        "Nenner prüfen.");
         }
         if (b.kind == SK_RAT && b.q.isZero()) {
             return fail(e, ErrorKind::DivideByZero, pos, "Division durch Null",
-                        "Nenner pr\xC3\xBCfen.");
+                        "Nenner prüfen.");
         }
         if (a.kind == SK_INT && b.kind == SK_INT) {
             double r = a.d / b.d;
@@ -185,45 +185,34 @@ bool opPow(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
         out = Slot::IntD(1.0);
         return true;
     }
-    if (a.isExact() && b.isExact()) {
-        if (b.kind == SK_INT) {
-            int64_t ex = (int64_t)b.d;
-            if (ex > 1000 || ex < -1000) {
-                return fail(e, ErrorKind::Limit, pos, "Exponent zu gro\xC3\x9F",
-                            "Ganze Exponenten nur bis 1000.");
-            }
-            if (a.kind == SK_INT) {
-                double base = a.d;
-                // fast path: integer power that stays inside 2^53
-                if (ex >= 0) {
-                    double r = std::pow(base, (double)ex);
-                    if (fitsInt(r)) { out = Slot::IntD(r); return true; }
-                }
-            }
-            std::string msg;
-            Rational r;
-            if (!Rational::powInt(a.toQ(), BigInt::fromInt64(ex), r, msg)) {
-                return fail(e, ErrorKind::DivideByZero, pos, msg);
-            }
-            if (r.isInteger() && fitsInt(r.toDouble())) {
-                out = Slot::IntD(r.toDouble());
+    if (a.isExact() && b.isExact() && b.kind == SK_INT) {
+        int64_t ex = (int64_t)b.d;
+        if (ex > 1000 || ex < -1000) {
+            return fail(e, ErrorKind::Limit, pos, "Exponent zu groß",
+                        "Ganze Exponenten nur bis 1000.");
+        }
+        if (a.kind == SK_INT && ex >= 0) {
+            double r = std::pow(a.d, (double)ex);
+            if (fitsInt(r)) {
+                out = Slot::IntD(r);
                 return true;
             }
-            out = Slot::Rat(r);
+        }
+        std::string msg;
+        Rational r;
+        if (!Rational::powInt(a.toQ(), BigInt::fromInt64(ex), r, msg)) {
+            return fail(e, ErrorKind::DivideByZero, pos, msg);
+        }
+        if (r.isInteger() && fitsInt(r.toDouble())) {
+            out = Slot::IntD(r.toDouble());
             return true;
         }
-        // exact base with rational (non-integer) exponent → numeric path
-        double base = a.toD(), ex = b.toD();
-        if (base < 0.0 && std::fmod(ex, 1.0) != 0.0) {
-            return fail(e, ErrorKind::Domain, pos,
-                        "Negative Basis mit gebrochenem Exponenten",
-                        "Ganze Exponenten liefern ein reelles Ergebnis.");
-        }
-        out = Slot::Real(std::pow(base, ex));
+        out = Slot::Rat(r);
         return true;
     }
-    double base2 = a.toD(), ex2 = b.toD();
-    if (base2 < 0.0 && std::fmod(ex2, 1.0) != 0.0) {
+    // fractional/rational exponent or inexact base: numeric
+    double base = a.toD(), ex = b.toD();
+    if (base < 0.0 && std::fmod(ex, 1.0) != 0.0) {
         return fail(e, ErrorKind::Domain, pos,
                     "Negative Basis mit gebrochenem Exponenten",
                     "Ganze Exponenten liefern ein reelles Ergebnis.");
@@ -244,12 +233,12 @@ bool opFact(const Slot& a, Slot& out, int pos, AxialError& e) {
         int64_t n = (int64_t)a.d;
         if (n < 0) {
             return fail(e, ErrorKind::Domain, pos,
-                        "Fakult\xC3\xA4t nur f\xC3\xBCr nicht-negative Ganzzahlen", hintMsg);
+                        "Fakultät nur für nicht-negative Ganzzahlen", hintMsg);
         }
         if (n > 10000) {
             return fail(e, ErrorKind::Limit, pos,
-                        "Fakult\xC3\xA4t nur bis 10000 berechenbar",
-                        "Gr\xC3\xB6\xC3\x9Fere Werte mit N\xC3\xA4herung berechnen.");
+                        "Fakultät nur bis 10000 berechenbar",
+                        "Größere Werte mit Näherung berechnen.");
         }
         if (n <= 18) {   // 18! < 2^53
             double acc = 1.0;
@@ -268,7 +257,7 @@ bool opFact(const Slot& a, Slot& out, int pos, AxialError& e) {
                                           nullptr, 10);
         if (n < 0 || n > 10000) {
             return fail(e, ErrorKind::Limit, pos,
-                        "Fakult\xC3\xA4t nur bis 10000 berechenbar");
+                        "Fakultät nur bis 10000 berechenbar");
         }
         Rational acc = Rational::one();
         for (int64_t i = 2; i <= n; ++i) acc = acc.mul(Rational::fromInt64(i));
@@ -276,7 +265,7 @@ bool opFact(const Slot& a, Slot& out, int pos, AxialError& e) {
         return true;
     }
     return fail(e, ErrorKind::Domain, pos,
-                "Fakult\xC3\xA4t nur f\xC3\xBCr nicht-negative Ganzzahlen", hintMsg);
+                "Fakultät nur für nicht-negative Ganzzahlen", hintMsg);
 }
 bool opPct(const Slot& a, Slot& out) {
     // x% = x/100 exactly
@@ -341,7 +330,7 @@ bool requireFinite(double v, int pos, AxialError& e, const char* fn) {
     if (!std::isfinite(v)) {
         return fail(e, ErrorKind::Domain, pos,
                     std::string(fn) + ": Ergebnis nicht definiert",
-                    "Definitionsbereich pr\xC3\xBCfen.");
+                    "Definitionsbereich prüfen.");
     }
     return true;
 }
@@ -386,11 +375,11 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
     // arity guard: named functions get exactly the right argument count
     auto it = functionTable().find(fn);
     int want = (it != functionTable().end()) ? it->second.arity : 0;
-    if (want >= 0 && (int)argc != (size_t)want) {
+    if (want >= 0 && (int)argc != want) {
         return fail(e, ErrorKind::Domain, pos,
                     fn + ": " + std::to_string(want) +
                         (want == 1 ? " Argument erwartet" : " Argumente erwartet"),
-                    "Funktionssignatur pr\xC3\xBCfen.");
+                    "Funktionssignatur prüfen.");
     }
     if (want < 0 && argc == 0) {
         return fail(e, ErrorKind::Domain, pos, fn + ": keine Argumente",
@@ -470,7 +459,7 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
             int64_t r = (int64_t)std::strtoull(BigInt::abs(rB).toDecimal().c_str(), nullptr, 10);
             if (r < 0 || n < 0 || r > n) {
                 return fail(e, ErrorKind::Domain, pos,
-                            std::string(fn) + ": 0 \xE2\x89\xA4 r \xE2\x89\xA4 n erwartet");
+                            std::string(fn) + ": 0 ≤ r ≤ n erwartet");
             }
             BigInt result = BigInt::fromInt64(1);
             if (fn == "npr") {
@@ -649,8 +638,8 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
         if (fn == "log" && argc >= 2) b = args[1].toD();
         if (x <= 0.0 || b <= 0.0 || b == 1.0) {
             return fail(e, ErrorKind::Domain, pos,
-                        std::string(fn) + ": nur f\xC3\xBCr positive Zahlen definiert",
-                        "Argument gr\xC3\xB6\xC3\x9Fer 0 w\xC3\xA4hlen.");
+                        std::string(fn) + ": nur für positive Zahlen definiert",
+                        "Argument größer 0 wählen.");
         }
         out = Slot::Real(std::log(x) / std::log(b));
         return true;
@@ -713,10 +702,6 @@ Slot foldConst(const Node& n) {
         default:
             return Slot::Real(0.0);
     }
-}
-
-bool isConstNode(const Node& n) {
-    return n.kind == NodeKind::Num || n.kind == NodeKind::Const;
 }
 
 struct C {

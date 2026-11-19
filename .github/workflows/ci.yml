@@ -80,11 +80,12 @@ jobs:
           dotnet build src\Axial.App\Axial.App.csproj -c Release -p:Platform=x64 -p:AxialCoreDll="${{ github.workspace }}\build-core\axial_mathcore_dll.dll" -v:detailed -bl:${{ runner.temp }}\xaml.binlog
           if ($LASTEXITCODE -ne 0) {
             # XamlCompiler direkt mit derselben input.json fahren: der Grund
-            # erscheint dann ungefiltert im Log
+            # erscheint dann ungefiltert im Log (Konsole + Datei)
             if (Test-Path "$xamlDir\input.json") {
               $xc = "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk\1.6.241106002\tools\net472\XamlCompiler.exe"
-              & $xc "$xamlDir\input.json" "${{ runner.temp }}\output.json"
+              & $xc "$xamlDir\input.json" "${{ runner.temp }}\output.json" 2>&1 | Tee-Object -FilePath "${{ runner.temp }}\xamlc.log"
               Write-Host "XamlCompiler exit: $LASTEXITCODE"
+              Get-Content "${{ runner.temp }}\xamlc.log" -ErrorAction SilentlyContinue
             }
             exit 1
           }

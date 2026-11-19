@@ -1057,7 +1057,7 @@ bool vmRun(const Program& p, const Environment& env, Value& out, AxialError& err
                 if (v->kind == ValueKind::Rational) {
                     int64_t iv = 0;
                     if (v->q.isInteger() && v->q.num().fitsInt64(iv)) {
-                        st.push_back(Slot::IntD((double)iv);
+                        st.push_back(Slot::IntD((double)iv));
                     } else {
                         st.push_back(Slot::Rat(v->q));
                     }

@@ -33,8 +33,9 @@ TEST(rational_decimal_exact) {
 }
 
 TEST(rational_arithmetic) {
-    CHECK_EQ_STR(D("1", "3").add(D("1", "6")).toString(), "1/2");
-    CHECK_EQ_STR(D("2", "4").toString(), "1/2");
+    // D(whole, frac) is decimal text: D("1","3") == 1.3
+    CHECK_EQ_STR(D("1", "3").add(D("1", "6")).toString(), "29/10");
+    CHECK_EQ_STR(D("2", "4").toString(), "12/5");
     CHECK_EQ_STR(mk(1, 2).mul(mk(1, 2)).mul(mk(1, 2)).toString(), "1/8");
     CHECK_EQ_STR(mk(1, 7).mul(mk(7, 1)).toString(), "1");
     CHECK_EQ_STR(D("0", "1").add(D("0", "2")).toString(), "3/10");

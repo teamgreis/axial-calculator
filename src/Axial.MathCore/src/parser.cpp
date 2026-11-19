@@ -124,10 +124,8 @@ struct P {
                             if (peek().kind == Tok::RParen) {
                                 ++pos;
                             } else {
-                                fail(ErrorKind::Syntax, peek(),
-                                     "Schließende \")\" fehlt",
-                                     "Klammer schließen oder Ausdruck kürzen.");
-                                return nullptr;
+                                // unclosed parenthesis: auto-fix
+                                ++fixed;
                             }
                         }
                     } else {

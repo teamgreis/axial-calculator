@@ -68,8 +68,9 @@ bool Rational::fromDouble(double x, Rational& out) {
     double m = std::frexp(x, &exp);           // x = m * 2^exp, 0.5 <= |m| < 1
     // scale mantissa to an integer: m * 2^53 is exact
     double mant = std::ldexp(m, 53);          // integer, |mant| < 2^53
-    uint64_t mi = (uint64_t)mant;
+    uint64_t mi = (uint64_t)std::fabs(mant);
     BigInt num = bigFromU64(mi);
+    if (mant < 0) num = -num;
     BigInt den = BigInt::fromInt64(1);
     int e = exp - 53;
     if (e >= 0) {

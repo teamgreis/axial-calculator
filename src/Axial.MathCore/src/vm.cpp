@@ -919,6 +919,19 @@ struct C {
                 emit(Op::Pct, 0, n.pos);
                 return true;
             case NodeKind::Call: {
+                int want = functionArity(n.name);
+                if (want >= 0 && (int)n.kids.size() != want) {
+                    return fail(err, ErrorKind::Domain, n.pos,
+                                n.name + ": " + std::to_string(want) +
+                                    (want == 1 ? " Argument erwartet"
+                                               : " Argumente erwartet"),
+                                "Funktionssignatur prüfen.");
+                }
+                if (want < 0 && n.kids.empty()) {
+                    return fail(err, ErrorKind::Domain, n.pos,
+                                n.name + ": keine Argumente",
+                                "Mindestens ein Argument angeben.");
+                }
                 for (auto& kid : n.kids) {
                     if (!emitNode(*kid)) return false;
                 }

@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: CMake konfigurieren (Ninja + MSVC)
+      - name: CMake konfigurieren (Ninja + MSVC/GCC)
         run: cmake -S src/Axial.MathCore -B build-core -G Ninja -DCMAKE_BUILD_TYPE=Release
 
       - name: Bauen
@@ -24,3 +24,36 @@ jobs:
 
       - name: Benchmark
         run: .\build-core\axial_bench.exe
+
+  baseline:
+    name: ELIAN-Baseline (dieselbe Maschine, faire Messung)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ELIAN-Engine aus dem öffentlichen Repo laden und vermessen
+        shell: pwsh
+        run: |
+          node -e "
+          const https=require('https');
+          const fs=require('fs');
+          const file='elian.html';
+          https.get('https://raw.githubusercontent.com/teamgreis/elian-ultimate-calculator/main/ELIAN_Ultimate_Calculator_v10.0.html',res=>{
+            let d='';res.on('data',c=>d+=c);res.on('end',()=>{
+              fs.writeFileSync(file,d);
+              const m=d.match(/<script>([\s\S]*?)<\/script>/);
+              if(!m){console.error('kein Engine-Block');process.exit(1);}
+              const vm=require('vm');
+              vm.runInThisContext(m[1],{filename:'elian-engine.js'});
+              const cases=[['arithmetic','2+3*4',1000000],['rational','(1/3+1/6)*840',500000],['trig','sin(30)^2+cos(60)^2',500000],['radical','sqrt(2)*sqrt(3)+ln(e)',500000]];
+              console.log('benchmark,unit=ns_per_op (ELIAN v10.1, Node '+process.version+')');
+              for(const [name,src,iters] of cases){
+                for(let i=0;i<10000;i++) evalExpr(src);
+                const t0=process.hrtime.bigint();
+                let sink=0;
+                for(let i=0;i<iters;i++){const r=evalExpr(src);if(r.ok)sink+=(r.approx||0);}
+                const t1=process.hrtime.bigint();
+                console.log('elian,'+name+','+(Number(t1-t0)/iters).toFixed(1));
+              }
+            });
+          }).on('error',e=>{console.error(e.message);process.exit(1);});
+          "

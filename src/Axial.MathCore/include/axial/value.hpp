@@ -20,7 +20,6 @@ struct Value {
         Value r;
         r.kind = ValueKind::Rational;
         r.q = v;
-        r.re = v.toDouble();
         return r;
     }
     static Value real(double x) {

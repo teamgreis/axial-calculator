@@ -31,12 +31,12 @@ struct Slot {
     Rational q;
     double re = 0.0;
     double im = 0.0;
+    mutable bool converted = false;   // re holds q's double value once computed
 
     static Slot ExactQ(Rational v) {
         Slot s;
         s.exact = true;
-        s.q = v;
-        s.re = v.toDouble();
+        s.q = v;            // double conversion is lazy (toD) — never eagerly
         return s;
     }
     static Slot Real(double v) {
@@ -51,7 +51,13 @@ struct Slot {
         s.im = im;
         return s;
     }
-    double toD() const { return exact ? q.toDouble() : re; }
+    double toD() const {
+        if (exact && !converted) {
+            re = q.toDouble();
+            converted = true;
+        }
+        return re;
+    }
 };
 
 Value slotToValue(const Slot& s) {

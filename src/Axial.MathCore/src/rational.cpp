@@ -83,6 +83,13 @@ bool Rational::fromDouble(double x, Rational& out) {
 }
 
 Rational Rational::add(const Rational& o) const {
+    if (isZero()) return o;
+    if (o.isZero()) return *this;
+    if (d == BigInt::fromInt64(1) && o.d == BigInt::fromInt64(1)) {
+        Rational r;                      // integer fast path: no gcd
+        r.n = n + o.n;
+        return r;
+    }
     // lcm approach as ELIAN: d = lcm(d1,d2)
     BigInt g = BigInt::gcd(d, o.d);
     BigInt l = d / g * o.d;    // exact
@@ -107,6 +114,11 @@ int Rational::compare(const Rational& a, const Rational& b) {
 
 Rational Rational::mul(const Rational& o) const {
     if (isZero() || o.isZero()) return zero();
+    if (d == BigInt::fromInt64(1) && o.d == BigInt::fromInt64(1)) {
+        Rational r;                      // integer fast path: no gcd
+        r.n = n * o.n;
+        return r;
+    }
     // cross-cancel to keep operands small
     BigInt g1 = BigInt::gcd(n, o.d);
     BigInt g2 = BigInt::gcd(o.n, d);

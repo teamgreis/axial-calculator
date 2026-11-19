@@ -56,6 +56,32 @@ double nsPerOpCompiled(const char* src, int iters, const EvalOptions& opts) {
 
 }  // namespace
 
+double nsPhaseParse(const char* src, int iters) {
+    auto t0 = Clock::now();
+    volatile size_t sink = 0;
+    for (int i = 0; i < iters; ++i) {
+        ParseResult r = Parser::parse(src);
+        sink += r.ok ? 1u : 0u;
+    }
+    auto t1 = Clock::now();
+    (void)sink;
+    return std::chrono::duration<double, std::nano>(t1 - t0).count() / iters;
+}
+
+double nsPhaseParseCompile(const char* src, int iters) {
+    Program prog;
+    auto t0 = Clock::now();
+    volatile size_t sink = 0;
+    for (int i = 0; i < iters; ++i) {
+        ParseResult pr = Parser::parse(src);
+        AxialError e;
+        if (pr.ok && Compiler::compile(*pr.root, prog, e)) ++sink;
+    }
+    auto t1 = Clock::now();
+    (void)sink;
+    return std::chrono::duration<double, std::nano>(t1 - t0).count() / iters;
+}
+
 int main() {
     struct Case {
         const char* name;

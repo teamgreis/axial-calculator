@@ -39,7 +39,10 @@ struct Value {
 
     bool isExact() const { return kind == ValueKind::Rational; }
     bool isComplex() const { return kind == ValueKind::Complex; }
-    double toDouble() const { return q.toDouble(); }
+    double toDouble() const {
+        if (kind == ValueKind::Rational) return q.toDouble();
+        return re;
+    }
 };
 
 // ELIAN-compatible number formatting:

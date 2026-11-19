@@ -330,22 +330,26 @@ bool callFunction(const std::string& fn, const std::vector<Slot>& args,
                 return fail(e, ErrorKind::Domain, pos,
                             std::string(fn) + ": 0 ≤ r ≤ n erwartet");
             }
-            if (r > n - r) r = n - r;
             BigInt result = BigInt::fromInt64(1);
-            for (int64_t i = 0; i < r; ++i) {
-                result = result * BigInt::fromInt64(n - i);
-                std::string msg;
-                BigInt q, rem;
-                BigInt::divmod(result, BigInt::fromInt64(i + 1), q, rem, msg);
-                if (!rem.isZero()) {
-                    return fail(e, ErrorKind::Internal, pos, fn + ": interne Ungenauigkeit");
-                }
-                result = q;
-            }
             if (fn == "npr") {
-                BigInt p = BigInt::fromInt64(1);
-                for (int64_t i = 0; i < r; ++i) p = p * BigInt::fromInt64(n - i);
-                result = p;
+                // n·(n-1)···(n-r+1) with the original r
+                for (int64_t i = 0; i < r; ++i) {
+                    result = result * BigInt::fromInt64(n - i);
+                }
+            } else {
+                // binomial coefficient: exploit symmetry on a clamped copy
+                int64_t k = (r > n - r) ? (n - r) : r;
+                for (int64_t i = 0; i < k; ++i) {
+                    result = result * BigInt::fromInt64(n - i);
+                    std::string msg;
+                    BigInt q, rem;
+                    BigInt::divmod(result, BigInt::fromInt64(i + 1), q, rem, msg);
+                    if (!rem.isZero()) {
+                        return fail(e, ErrorKind::Internal, pos,
+                                    fn + ": interne Ungenauigkeit");
+                    }
+                    result = q;
+                }
             }
             std::string msg;
             Rational v;

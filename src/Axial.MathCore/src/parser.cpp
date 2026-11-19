@@ -104,7 +104,9 @@ struct P {
             case Tok::Ident: {
                 std::string name = t.text;
                 if (isCoreConstant(name)) {
-                    return make(NodeKind::Const, t.pos);
+                    auto c = make(NodeKind::Const, t.pos);
+                    c->name = name;
+                    return c;
                 }
                 if (isCoreFunction(name)) {
                     auto call = make(NodeKind::Call, t.pos);

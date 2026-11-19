@@ -289,22 +289,22 @@ bool BigInt::fromDecimal(const std::string& s, BigInt& out) {
 std::string BigInt::toDecimal() const {
     if (isZero()) return "0";
     std::vector<uint32_t> mag = mag_;
-    std::string out;
+    std::vector<std::string> chunks;          // least-significant first
     while (!mag.empty()) {
         std::vector<uint32_t> q;
         uint32_t rem = 0;
-        divmodSmall(mag, kChunk, q, rem);   // q must not alias mag
+        divmodSmall(mag, kChunk, q, rem);     // q must not alias mag
         mag.swap(q);
         char buf[16];
         std::snprintf(buf, sizeof(buf), "%09u", rem);
-        if (out.empty()) {
-            // most significant chunk: strip leading zeros
-            std::string chunk(buf);
-            size_t nz = chunk.find_first_not_of('0');
-            out = (nz == std::string::npos) ? "0" : chunk.substr(nz);
-        } else {
-            out = std::string(buf) + out;
-        }
+        chunks.push_back(std::string(buf));
+    }
+    // most significant chunk: strip its leading zeros
+    std::string out = chunks.back();
+    size_t nz = out.find_first_not_of('0');
+    out = (nz == std::string::npos) ? "0" : out.substr(nz);
+    for (size_t i = chunks.size() - 1; i-- > 0;) {
+        out += chunks[i];
     }
     std::string s = isNegative() ? "-" : "";
     s += out;

@@ -79,6 +79,7 @@ bool Tokenizer::run(const std::string& src, std::vector<Token>& out,
                 err.pos = (int)i;
                 err.token = std::string(1, c);
                 err.message = "Unbekanntes Zeichen: " + err.token;
+                err.hint = "Erlaubt sind Ziffern, Buchstaben, + - * / ^ % ! ( ) , und Operatoren.";
                 return false;
             }
             Token t;

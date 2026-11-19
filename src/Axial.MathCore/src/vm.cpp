@@ -222,9 +222,8 @@ bool opPow(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
         out = Slot::Real(std::pow(base, ex));
         return true;
     }
-    ex = b.toD();
-    base = a.toD();
-    if (base < 0.0 && std::fmod(ex, 1.0) != 0.0) {
+    double base2 = a.toD(), ex2 = b.toD();
+    if (base2 < 0.0 && std::fmod(ex2, 1.0) != 0.0) {
         return fail(e, ErrorKind::Domain, pos,
                     "Negative Basis mit gebrochenem Exponenten",
                     "Ganze Exponenten liefern ein reelles Ergebnis.");

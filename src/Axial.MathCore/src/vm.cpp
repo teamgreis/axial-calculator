@@ -31,7 +31,8 @@ struct Slot {
     Rational q;
     double re = 0.0;
     double im = 0.0;
-    mutable bool converted = false;   // re holds q's double value once computed
+    mutable bool converted = false;   // dCache holds q's double value once computed
+    mutable double dCache = 0.0;
 
     static Slot ExactQ(Rational v) {
         Slot s;

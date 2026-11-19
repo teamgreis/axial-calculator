@@ -76,11 +76,17 @@ jobs:
       - name: WinUI-App bauen (XamlIL-Details sichtbar)
         shell: pwsh
         run: |
+          $xamlDir = "src\Axial.App\obj\x64\Release\net8.0-windows10.0.19041.0\win-x64"
           dotnet build src\Axial.App\Axial.App.csproj -c Release -p:Platform=x64 -p:AxialCoreDll="${{ github.workspace }}\build-core\axial_mathcore_dll.dll" -v:detailed -bl:${{ runner.temp }}\xaml.binlog
           if ($LASTEXITCODE -ne 0) {
-            $xaml = Get-ChildItem -Recurse src\Axial.App -Filter *.xaml | Resolve-Path -Relative
-            Write-Host "XAML-Dateien: $xaml"
-            exit $LASTEXITCODE
+            # XamlCompiler direkt mit derselben input.json fahren: der Grund
+            # erscheint dann ungefiltert im Log
+            if (Test-Path "$xamlDir\input.json") {
+              $xc = "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk\1.6.241106002\tools\net472\XamlCompiler.exe"
+              & $xc "$xamlDir\input.json" "${{ runner.temp }}\output.json"
+              Write-Host "XamlCompiler exit: $LASTEXITCODE"
+            }
+            exit 1
           }
 
       - name: MSIX suchen

@@ -748,7 +748,7 @@ struct C {
     void emitPush(const Slot& s, int pos) {
         switch (s.kind) {
             case SK_INT:
-                emit(Op::PushR, poolR(s.d), pos);
+                emit(Op::PushI, poolR(s.d), pos);
                 break;
             case SK_REAL:
             case SK_COMPLEX:
@@ -834,7 +834,7 @@ struct C {
         switch (n.kind) {
             case NodeKind::Num: {
                 if (n.num.isInteger() && fitsInt(n.num.toDouble())) {
-                    emit(Op::PushR, poolR(n.num.toDouble()), n.pos);
+                    emit(Op::PushI, poolR(n.num.toDouble()), n.pos);
                 } else {
                     emit(Op::PushQ, poolQ(n.num), n.pos);
                 }
@@ -923,6 +923,9 @@ bool vmRun(const Program& p, const Environment& env, Value& out, AxialError& err
                 break;
             case Op::PushR:
                 st.push_back(Slot::Real(p.rpool[in.arg]));
+                break;
+            case Op::PushI:
+                st.push_back(Slot::IntD(p.rpool[in.arg]));
                 break;
             case Op::Add: {
                 Slot b = st.back(); st.pop_back();

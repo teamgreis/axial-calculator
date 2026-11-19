@@ -13,8 +13,9 @@ namespace axial {
 enum class AngleMode { Deg, Rad, Gon };
 
 enum class Op : uint8_t {
-    PushQ,     // arg: index into Program::qpool
-    PushR,     // arg: index into Program::rpool
+    PushQ,     // arg: index into Program::qpool  (exact fraction)
+    PushR,     // arg: index into Program::rpool  (inexact double)
+    PushI,     // arg: index into Program::rpool  (exact integer double)
     Add, Sub, Mul, Div, Pow, Neg, Fact, Pct,
     Call,      // arg: index into Program::calls
     LoadVar,   // arg: index into Program::vars

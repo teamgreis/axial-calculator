@@ -53,9 +53,12 @@ struct Slot {
         return s;
     }
     double toD() const {
-        if (exact && !converted) {
-            re = q.toDouble();
-            converted = true;
+        if (exact) {
+            if (!converted) {
+                dCache = q.toDouble();
+                converted = true;
+            }
+            return dCache;
         }
         return re;
     }

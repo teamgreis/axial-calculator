@@ -208,8 +208,9 @@ bool opPow(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
         if (!Rational::powInt(a.toQ(), BigInt::fromInt64(ex), r, msg)) {
             return fail(e, ErrorKind::DivideByZero, pos, msg);
         }
-        if (r.isInteger() && fitsInt(r.toDouble())) {
-            out = Slot::IntD(r.toDouble());
+        int64_t iv = 0;
+        if (r.isInteger() && r.num().fitsInt64(iv)) {
+            out = Slot::IntD((double)iv);
             return true;
         }
         out = Slot::Rat(r);
@@ -440,14 +441,14 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
                                        : ((ax.isZero() || ay.isZero())
                                               ? BigInt::fromInt64(0)
                                               : (ax / g) * ay);
-            if (res < BigInt::fromInt64(-9007199254740992LL) ||
-                res > BigInt::fromInt64(9007199254740992LL)) {
+            int64_t iv = 0;
+            if (res.fitsInt64(iv)) {
+                out = Slot::IntD((double)iv);
+            } else {
                 std::string msg;
                 Rational r;
                 Rational::make(res, BigInt::fromInt64(1), r, msg);
                 out = Slot::Rat(r);
-            } else {
-                out = Slot::IntD(std::strtod(res.toDecimal().c_str(), nullptr));
             }
             return true;
         }
@@ -484,14 +485,41 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
                     result = q;
                 }
             }
-            if (result < BigInt::fromInt64(-9007199254740992LL) ||
-                result > BigInt::fromInt64(9007199254740992LL)) {
+            int64_t iv = 0;
+            if (result.fitsInt64(iv)) {
+                out = Slot::IntD((double)iv);
+            } else {
                 std::string msg;
                 Rational r;
                 Rational::make(result, BigInt::fromInt64(1), r, msg);
                 out = Slot::Rat(r);
+            }
+            return true;
+        }
+        if (fn == "sqrt" && a0.kind == SK_INT) {
+            // integer fast path: perfect-square check without BigInt work
+            int64_t iv = (int64_t)a0.d;
+            if (iv >= 0) {
+                int64_t r = (int64_t)std::sqrt((double)iv);
+                while (r > 0 && r * r > iv) --r;
+                while ((r + 1) * (r + 1) <= iv) ++r;
+                if (r * r == iv) {
+                    out = Slot::IntD((double)r);
+                } else {
+                    double v = std::sqrt(a0.d);
+                    if (!requireFinite(v, pos, e, "sqrt")) return false;
+                    out = Slot::Real(v);
+                }
+                return true;
+            }
+            int64_t p = -iv;
+            int64_t r = (int64_t)std::sqrt((double)p);
+            while (r > 0 && r * r > p) --r;
+            while ((r + 1) * (r + 1) <= p) ++r;
+            if (r * r == p) {
+                out = Slot::Complex(0.0, (double)r);   // exact 2i
             } else {
-                out = Slot::IntD(std::strtod(result.toDecimal().c_str(), nullptr));
+                out = Slot::Complex(0.0, std::sqrt((double)p));
             }
             return true;
         }
@@ -1027,8 +1055,9 @@ bool vmRun(const Program& p, const Environment& env, Value& out, AxialError& err
                                 "Bekannte Variablen: x, y, ans.");
                 }
                 if (v->kind == ValueKind::Rational) {
-                    if (v->q.isInteger() && fitsInt(v->q.toDouble())) {
-                        st.push_back(Slot::IntD(v->q.toDouble()));
+                    int64_t iv = 0;
+                    if (v->q.isInteger() && v->q.num().fitsInt64(iv)) {
+                        st.push_back(Slot::IntD((double)iv);
                     } else {
                         st.push_back(Slot::Rat(v->q));
                     }

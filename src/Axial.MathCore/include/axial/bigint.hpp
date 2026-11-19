@@ -49,6 +49,18 @@ public:
     // Number of decimal digits (1 for zero).
     size_t decimalDigits() const;
 
+    // Exact conversion to int64 when |value| <= 2^53 (no strings involved).
+    bool fitsInt64(int64_t& out) const {
+        if (mag_.size() > 2) return false;
+        uint64_t v = mag_.empty()
+                         ? 0
+                         : ((uint64_t)mag_[0] |
+                            (mag_.size() > 1 ? ((uint64_t)mag_[1] << 32) : 0));
+        if (v > 9007199254740992ULL) return false;
+        out = sign_ < 0 ? -(int64_t)v : (int64_t)v;
+        return true;
+    }
+
 private:
     friend struct BigIntAccess;
     std::vector<uint32_t> mag_;   // little-endian, no trailing zeros; empty = 0

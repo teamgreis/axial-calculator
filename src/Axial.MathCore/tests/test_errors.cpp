@@ -100,8 +100,6 @@ TEST(errors_typed_on_fuzz) {
                           "%", "!", "^", "()", "1(2)(3", "x+", "2**3",
                           "ncr(-1, 2)", "ncr(2, 5)", "log()", "1e", "1e+"};
     for (const char* m : more) {
-        std::printf("    fuzz-err: %s\n", m);
-        std::fflush(stdout);
         EvalResult r = E(m);
         if (r.ok) {
             CHECK(!r.text.empty());

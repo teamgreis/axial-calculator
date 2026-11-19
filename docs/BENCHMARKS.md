@@ -13,7 +13,8 @@ Gemessen wird pro Ausdruck in zwei Modi:
 | `eval` | Tokenize → Parse → Compile → Run → Format (Einzelschuss, wie ELIAN) |
 | `compiled` | Lauf eines bereits kompilierten Programms (der schnelle Pfad) |
 
-## Stand (Commit `ddc42fa`, CI-Lauf 44450494953)
+## Stand (Commit `35296a9`, CI-Läufe 44450494953 / 44454867072; Messwerte
+## schwanken läuft-zu-lauf ~10 %, Tabelle = letzter grüner Lauf)
 
 | Ausdruck | ELIAN v10.1 (ns) | Axial `eval` (ns) | Axial `compiled` (ns) | compiled vs. ELIAN |
 |---|---|---|---|---|

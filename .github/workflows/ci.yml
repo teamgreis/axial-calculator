@@ -57,3 +57,33 @@ jobs:
             });
           }).on('error',e=>{console.error(e.message);process.exit(1);});
           "
+
+  app:
+    name: WinUI-Schale (Build / MSIX)
+    runs-on: windows-latest
+    needs: core
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: .NET 8 SDK prüfen
+        run: dotnet --version
+
+      - name: Mathe-Kern bauen (Native-DLL)
+        run: |
+          cmake -S src/Axial.MathCore -B build-core -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-core
+
+      - name: WinUI-App bauen
+        run: dotnet build src\Axial.App\Axial.App.csproj -c Release -p:Platform=x64 -p:AxialCoreDll=${{ github.workspace }}\build-core\axial_mathcore_dll.dll
+
+      - name: MSIX suchen
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse -Filter *.msix .\src\Axial.App | ForEach-Object { Write-Host "MSIX: $($_.FullName)" }
+
+      - name: MSIX-Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: axial-msix
+          path: src/Axial.App/**/*.msix
+          if-no-files-found: error

@@ -1,0 +1,8 @@
+<Window x:Class="Axial.App.Shell.AxialWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid x:Name="RootGrid">
+        <!-- Shell-Inhalt (Titelzeile, Modulfläche, Toolbar) -->
+        <local:ShellPage x:Name="Shell" />
+    </Grid>
+</Window>

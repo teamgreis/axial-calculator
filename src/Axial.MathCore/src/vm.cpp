@@ -549,7 +549,10 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
                 double acc = 0.0;
                 for (size_t i = 0; i < argc; ++i) acc += args[i].d;
                 if (fitsInt(acc)) { out = Slot::IntD(acc); return true; }
-                out = Slot::Real(acc);
+                std::string msg;
+                Rational r;
+                Rational::div(Rational::fromDouble(acc), Rational::one(), r, msg);
+                out = Slot::Rat(r);
                 return true;
             }
             Rational acc = Rational::zero();
@@ -569,9 +572,15 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
             if (!anyRat) {
                 double acc = 0.0;
                 for (size_t i = 0; i < argc; ++i) acc += args[i].d;
-                double m = acc / (double)argc;
-                if (fitsInt(m)) { out = Slot::IntD(m); return true; }
-                out = Slot::Real(m);
+                std::string msg;
+                Rational r;
+                Rational::div(Rational::fromDouble(acc),
+                              Rational::fromInt64((int64_t)argc), r, msg);
+                if (r.isInteger() && fitsInt(r.toDouble())) {
+                    out = Slot::IntD(r.toDouble());
+                    return true;
+                }
+                out = Slot::Rat(r);
                 return true;
             }
             Rational acc = Rational::zero();

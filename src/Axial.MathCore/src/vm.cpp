@@ -212,15 +212,18 @@ bool opPow(const Slot& a, const Slot& b, Slot& out, int pos, AxialError& e) {
             out = Slot::Rat(r);
             return true;
         }
-        std::string msg;
-        Rational r;
-        if (!Rational::powInt(a.toQ(), b.q.num(), r, msg)) {
-            return fail(e, ErrorKind::DivideByZero, pos, msg);
+        // exact base with rational (non-integer) exponent → numeric path
+        double base = a.toD(), ex = b.toD();
+        if (base < 0.0 && std::fmod(ex, 1.0) != 0.0) {
+            return fail(e, ErrorKind::Domain, pos,
+                        "Negative Basis mit gebrochenem Exponenten",
+                        "Ganze Exponenten liefern ein reelles Ergebnis.");
         }
-        out = Slot::Rat(r);
+        out = Slot::Real(std::pow(base, ex));
         return true;
     }
-    double base = a.toD(), ex = b.toD();
+    ex = b.toD();
+    base = a.toD();
     if (base < 0.0 && std::fmod(ex, 1.0) != 0.0) {
         return fail(e, ErrorKind::Domain, pos,
                     "Negative Basis mit gebrochenem Exponenten",

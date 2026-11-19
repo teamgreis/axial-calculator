@@ -98,6 +98,7 @@ inline void checkClose(double got, double want, double eps, const char* file,
                 std::printf("  FAIL  %s (%d)\n", c.name, delta);          \
                 f += delta;                                               \
             }                                                             \
+            std::fflush(stdout);                                          \
         }                                                                 \
         std::printf("\n%d Prüfungen, %d Fehler\n",                 \
                     axtest::checks(), axtest::failures());                \

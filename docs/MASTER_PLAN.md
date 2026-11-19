@@ -19,7 +19,7 @@ Ein Taschenrechner, der sich anfühlt wie ein physisches Präzisionsinstrument:
 | Versprechen | Bedeutung |
 |---|---|
 | **Exakt** | Rationale Arithmetik mit BigInt — `1/3 + 1/6 = 1/2`, nie Float-Rauschen; symbolische Algebra auf demselben Kern |
-| **Schnell** | Kompilierte Ausdrücke (Bytecode-VM), nativ — **Stand: 3–19× schneller als ELIAN** (kompilierter Pfad, selbe Maschine, siehe BENCHMARKS.md); Ziel 400× mit klarem Optimierungsplan |
+| **Schnell** | Kompilierte Ausdrücke (Bytecode-VM), nativ — **Stand: 6,5–41× schneller als ELIAN** (kompilierter Pfad, selbe Maschine, siehe BENCHMARKS.md); Ziel 400× bleibt offen, nächster Hebel: Parse/Compile-Overhead |
 | **Unfehlbar** | Jeder Eingabezustand hat ein definiertes Ergebnis; kein Absturz, keine undefinierte Anzeige; Differenz- und Regressionstests gegen einen dokumentierten Golden-Korpus |
 
 ## 2. Warum Neuentwicklung statt Rewrite des alten Projekts?

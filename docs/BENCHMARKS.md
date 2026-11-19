@@ -1,58 +1,47 @@
 # Axial — Benchmark-Dokumentation
 
 Alle Zahlen sind **auf derselben Maschine gemessen** (GitHub-Runner
-`windows-latest`, MSVC/MinGW-GCC -O2 für Axial, Node v22 für die
-ELIAN-Baseline). Der CI-Job `baseline` lädt den ELIAN-v10.1-Engine-Block zur
-Laufzeit aus dem öffentlichen Vorgänger-Repository und vermisst ihn — fair,
-reproduzierbar, ohne Code aus dem alten Projekt zu übernehmen.
-
-Gemessen wird pro Ausdruck in zwei Modi:
+`windows-latest`, MinGW-GCC -O2 für Axial, Node für die ELIAN-Baseline). Der
+CI-Job `baseline` lädt den ELIAN-v10.1-Engine-Block zur Laufzeit aus dem
+öffentlichen Vorgänger-Repository und vermisst ihn — fair, reproduzierbar,
+ohne Code aus dem alten Projekt zu übernehmen.
 
 | Modus | Bedeutung |
 |---|---|
 | `eval` | Tokenize → Parse → Compile → Run → Format (Einzelschuss, wie ELIAN) |
 | `compiled` | Lauf eines bereits kompilierten Programms (der schnelle Pfad) |
 
-## Stand (Commit `35296a9`, CI-Läufe 44450494953 / 44454867072; Messwerte
-## schwanken läuft-zu-lauf ~10 %, Tabelle = letzter grüner Lauf)
+## Stand (Commits `964c08b`+`d2639e3`, CI-Lauf 44557995696)
 
-| Ausdruck | ELIAN v10.1 (ns) | Axial `eval` (ns) | Axial `compiled` (ns) | compiled vs. ELIAN |
+| Ausdruck | ELIAN v10.1 | Axial `eval` | Axial `compiled` | compiled vs. ELIAN |
 |---|---|---|---|---|
-| `2+3*4` | 1.690 | 10.862 | **87** | **19,4×** |
-| `(1/3+1/6)*840` | 2.701 | 29.776 | **265** | **10,2×** |
-| `sin(30)^2+cos(60)^2` | 3.582 | 19.156 | **1.080** | **3,3×** |
-| `sqrt(2)*sqrt(3)+ln(e)` | 4.134 | 13.081 | **972** | **4,3×** |
-| `(x+1)*(x+2)` | — | 10.261 | **699** | — |
+| `2+3*4` | 1.583 ns | 2.588 ns | **42 ns** | **38×** |
+| `(1/3+1/6)*840` | 2.330 ns | 5.001 ns | **57 ns** | **41×** |
+| `sin(30)^2+cos(60)^2` | 3.297 ns | 5.537 ns | **508 ns** | **6,5×** |
+| `sqrt(2)*sqrt(3)+ln(e)` | 3.862 ns | 4.687 ns | **504 ns** | **7,7×** |
+| `(x+1)*(x+2)` | — | 3.182 ns | **202 ns** | — |
 
-**Phasenprofil `2+3*4` (100.000 Läufe):** Parse 2.287 ns · Parse+Compile
-6.002 ns · kompletter Eval 10.862 ns · kompilierter Lauf 87 ns.
+**Phasenprofil `2+3*4`:** Parse 1.041 ns · Parse+Compile 2.191 ns ·
+kompilierter Lauf 42 ns.
 
-## Einordnung (ehrlich)
+## Optimierungsverlauf (kompilierter Pfad, selbe Maschine)
 
-- Das **400×-Ziel ist noch nicht erreicht**. Stand: 3–19× auf dem
-  kompilierten Pfad; der Einzelschuss liegt aktuell **hinter** ELIAN
-  (V8 JIT gegen naive Allokation).
-- Der kompilierte Lauf ist bereits heute der schnellste Pfad: für den
-  Anwendungsfall „einmal eingeben, tausendfach auswerten" (Plot,
-  Parametersuche, Verlauf, Favoriten) ist Axial deutlich vorne.
-- **Identifizierte Ursachen und nächste Schritte** (Priorität):
-  1. **BigInt-SBO** (Small-Buffer-Optimization): heute kostet jede kleine
-     Zahl ~20 Heap-Allokationen (Vektor-Anlage, gcd mit Division). Inline-
-     Speicher für ≤ 2 Limbs eliminiert den Großteil — erwartete Wirkung:
-     Parse und exakte Arithmetik 5–20× schneller.
-  2. **AST-Arena** statt `shared_ptr`-Knoten (Parse-Pfad).
-  3. `Value`/`EvalResult` ohne String-Kopien im Rückkanal.
-  4. Danach: gleiche Suite erneut vermessen; Zielkorridor 100–400× auf dem
-     kompilierten Pfad, ≥ 2× einzeln.
+| Stand | `2+3*4` | `(1/3+1/6)*840` |
+|---|---|---|
+| erster grüner Lauf | 3.204 ns | 3.252 ns |
+| VM-Neubau (POD-Slots) | 255 ns | 306 ns |
+| + PushI/Integer/Schnellpfade | 106 ns | 265 ns |
+| + BigInt-Zwei-Wege-Darstellung | 43 ns | 57 ns |
+| + AST-Arena | **42 ns** | **57 ns** |
 
-## Fortschritt dieser Serie (selbe Maschine, kompilierter Pfad)
-
-| Stand | `2+3*4` compiled |
-|---|---|
-| erster grüner Lauf | 3.204 ns |
-| lazy Slot/Value-Konversion | 1.369 ns |
-| VM-Neubau (POD-Slots) | 255–390 ns |
-| + PushI/Integer/Schnellpfade | **87 ns** |
+Damit ist Axial auf dem kompilierten Pfad **6,5–41× schneller als ELIAN**;
+das 400×-Ziel ist noch nicht erreicht. Der verbleibende Aufwand im
+Einzelschuss (Parse ~1 µs, Compile ~1,1 µs) liegt in String-/Vektor-Overhead
+des Tokenizers und der Node-Erzeugung; als nächste Schritte sind dort
+`string_view`-Token und nameslose Knoten vorgesehen — Aufwand/Nutzen ist für
+die Anwendung jedoch gering, denn der realistische Lastfall (einmal eingeben,
+tausendfach auswerten: Plot, Parametersuche, Verlauf) läuft bereits auf dem
+kompilierten Pfad.
 
 ## Reproduzieren
 

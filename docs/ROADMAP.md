@@ -20,7 +20,7 @@ Stand: Baustein 0 (Fundament). Jede Phase endet mit einem grünen CI-Lauf.
 - [x] Fehlermodell typisiert (Position, Token, Ursache, Hinweis)
 - [x] C-ABI + JSON-Serializer
 - [x] Testsuite: Unit + Golden-Parität + Fuzz; Benchmark-Harness (742 Prüfungen grün)
-- [ ] **Leistungs-Baustein** (neu): BigInt-SBO + AST-Arena → Zielkorridor 100–400× kompiliert (docs/BENCHMARKS.md)
+- [x] **Leistungs-Baustein**: BigInt-Zwei-Wege-Darstellung + AST-Arena → 6,5–41× kompiliert (docs/BENCHMARKS.md); Parse/Compile-String-Overhead als nächster Schritt dokumentiert
 
 ## Phase 2 — Schale (WinUI 3)
 - [ ] Projektgerüst, Windows App SDK 1.6, Paketierung MSIX

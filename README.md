@@ -15,8 +15,9 @@ Vorgängers wird übernommen.
 - **Exakt rechnen:** Brüche mit BigInt — `1/3 + 1/6 = 1/2`; symbolische Algebra,
   exakte Nullstellen, Kurvendiskussion, Zahlentheorie, Boolesche Algebra.
 - **Schnell:** Ausdrücke werden einmal kompiliert (Bytecode-VM) und millionenfach
-  ausgewertet; Ziel ≥ 400× Leistung gegenüber dem JS-Kern des Vorgängers —
-  gemessen in der CI, dokumentiert in `docs/BENCHMARKS.md`.
+  ausgewertet; aktuell **3–19× schneller als der Vorgänger** auf dem kompilierten
+  Pfad (gemessen auf derselben Maschine, dokumentiert in `docs/BENCHMARKS.md`) —
+  Ziel 400× mit klarem Optimierungsplan (BigInt-SBO, AST-Arena).
 - **Realistisches Liquid Glass:** echte Backdrop-Materialien (Mica/Acrylic),
   Spekular-Kanten, Feder-Physik, dynamische Bottom-Toolbar mit Tool-Menü.
 - **Unfehlbar:** typisierte Fehler mit Position und Korrekturhinweis statt

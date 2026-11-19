@@ -8,18 +8,19 @@ Stand: Baustein 0 (Fundament). Jede Phase endet mit einem grünen CI-Lauf.
 - [ ] Initialer Push + CI-Gerüst (core-Build läuft)
 - [ ] Golden-Korpus generieren (ELIAN lokal vermessen, Erwartungswerte committed)
 
-## Phase 1 — Mathe-Kern (C++)
-- [ ] BigInt (Sign-Magnitude, Limbs, gcd, pow, toString/fromString)
-- [ ] Rational (normalisiert, Arithmetik, Format Pretty-Print)
-- [ ] Tokenizer inkl. Unicode, Brüche, Prozent, implizite Multiplikation
-- [ ] Pratt-Parser: Präzedenz, rechts-assoziatives `^`, Fakultät, Auto-Klammern
-- [ ] Wertemodell (Rational/Real/Complex), Winkelmodi, `ans`
-- [ ] Bytecode-Kompiler + Register-VM (doppelter Pfad: exakt/numerisch)
-- [ ] Funktionenbibliothek (Trig/Hyper/Log/Rundung/Kombinatorik/Zahlentheorie/Statistik)
-- [ ] Konstanten (pi, e, tau, phi) mit exaktem Status
-- [ ] Fehlermodell typisiert (Position, Token, Ursache, Hinweis)
-- [ ] C-ABI + JSON-Serializer, C#-Wrapper-Gerüst
-- [ ] Testsuite: Unit + Golden (≥ 500) + Fuzz; Benchmark-Harness
+## Phase 1 — Mathe-Kern (C++) ✅ (Build/Tests grün in CI)
+- [x] BigInt (Sign-Magnitude, Limbs, gcd, pow, toString/fromString)
+- [x] Rational (normalisiert, Arithmetik, Format Pretty-Print)
+- [x] Tokenizer inkl. Unicode, Brüche, Prozent, implizite Multiplikation
+- [x] Pratt-Parser: Präzedenz, rechts-assoziatives `^`, Fakultät, Auto-Klammern
+- [x] Wertemodell (Rational/Integer/Real/Complex), Winkelmodi, `ans`
+- [x] Bytecode-Kompiler + Stack-VM (exakt/numerisch doppelter Pfad)
+- [x] Funktionenbibliothek (Trig/Hyper/Log/Rundung/Kombinatorik, gcd/lcm/ncr/npr, min/max/sum/mean)
+- [x] Konstanten (pi, e, tau, phi)
+- [x] Fehlermodell typisiert (Position, Token, Ursache, Hinweis)
+- [x] C-ABI + JSON-Serializer
+- [x] Testsuite: Unit + Golden-Parität + Fuzz; Benchmark-Harness (742 Prüfungen grün)
+- [ ] **Leistungs-Baustein** (neu): BigInt-SBO + AST-Arena → Zielkorridor 100–400× kompiliert (docs/BENCHMARKS.md)
 
 ## Phase 2 — Schale (WinUI 3)
 - [ ] Projektgerüst, Windows App SDK 1.6, Paketierung MSIX

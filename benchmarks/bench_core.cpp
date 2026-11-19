@@ -61,7 +61,7 @@ double nsPhaseParse(const char* src, int iters) {
     volatile size_t sink = 0;
     for (int i = 0; i < iters; ++i) {
         ParseResult r = Parser::parse(src);
-        sink += r.ok ? 1u : 0u;
+        sink += r.ok() ? 1u : 0u;
     }
     auto t1 = Clock::now();
     (void)sink;
@@ -75,7 +75,7 @@ double nsPhaseParseCompile(const char* src, int iters) {
     for (int i = 0; i < iters; ++i) {
         ParseResult pr = Parser::parse(src);
         AxialError e;
-        if (pr.ok && Compiler::compile(*pr.root, prog, e)) ++sink;
+        if (pr.ok() && Compiler::compile(*pr.root, prog, e)) ++sink;
     }
     auto t1 = Clock::now();
     (void)sink;

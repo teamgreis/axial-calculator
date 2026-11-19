@@ -20,8 +20,14 @@ struct P {
 
     explicit P(const std::vector<Token>& t) : tk(t) {}
 
-    const Token& peek() const { return tk[pos]; }
-    const Token& advance() { return tk[pos++]; }
+    const Token& peek() const {
+        // bounds-safe: the tokenizer always terminates with an End sentinel
+        return pos < tk.size() ? tk[pos] : tk.back();
+    }
+    const Token& advance() {
+        if (pos < tk.size()) ++pos;
+        return tk[std::min(pos - 1, tk.size() - 1)];
+    }
     bool atEnd() const { return tk[pos].kind == Tok::End; }
 
     bool isOp(const char* v) const {
@@ -116,10 +122,14 @@ struct P {
                         if (peek().kind == Tok::RParen) {
                             ++pos;
                         } else {
-                            call->kids.push_back(expr());
+                            NodePtr a1 = expr();
+                            if (!a1) return nullptr;
+                            call->kids.push_back(a1);
                             while (peek().kind == Tok::Comma) {
                                 ++pos;
-                                call->kids.push_back(expr());
+                                NodePtr a2 = expr();
+                                if (!a2) return nullptr;
+                                call->kids.push_back(a2);
                             }
                             if (peek().kind == Tok::RParen) {
                                 ++pos;
@@ -346,8 +356,9 @@ ParseResult Parser::parse(const std::string& src) {
         res.err = parser.err;
         return res;
     }
-    // trailing tokens that are not consumed
-    const Token& rest = tokens[parser.pos];
+    // trailing tokens that are not consumed (bounds-safe)
+    const Token& rest = parser.pos < tokens.size() ? tokens[parser.pos]
+                                                   : tokens.back();
     if (rest.kind == Tok::RParen) {
         parser.fail(ErrorKind::Syntax, rest,
                     "Unerwartetes Symbol am Ende",

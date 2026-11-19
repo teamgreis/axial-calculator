@@ -63,8 +63,16 @@ static std::string formatComplex(const Value& v) {
     return s;
 }
 
+std::string formatInteger(double v) {
+    // exact for integral doubles up to 2^53 (no exponential form)
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "%.0f", v);
+    return std::string(buf);
+}
+
 std::string valueToString(const Value& v) {
     if (v.kind == ValueKind::Rational) return v.q.toString();
+    if (v.kind == ValueKind::Integer) return formatInteger(v.re);
     if (v.kind == ValueKind::Complex) return formatComplex(v);
     return formatDouble(v.re);
 }

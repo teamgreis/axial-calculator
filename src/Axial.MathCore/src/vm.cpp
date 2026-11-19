@@ -94,10 +94,7 @@ struct Slot {
 
 Value slotToValue(const Slot& s) {
     if (s.kind == SK_RAT) return Value::rational(s.q);
-    if (s.kind == SK_INT) {
-        Value v = Value::rational(s.toQ());
-        return v;
-    }
+    if (s.kind == SK_INT) return Value::integer(s.d);
     if (s.kind == SK_COMPLEX) return Value::complex(s.d, s.im);
     return Value::real(s.d);
 }

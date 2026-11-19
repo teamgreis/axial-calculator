@@ -64,6 +64,14 @@ bool Rational::fromDecimalDigits(const std::string& whole,
 bool Rational::fromDouble(double x, Rational& out) {
     if (!std::isfinite(x)) return false;
     if (x == 0.0) { out = zero(); return true; }
+    if (x == std::floor(x) && std::fabs(x) < 9007199254740992.0) {
+        // integral double: two limbs at most, no exponent math
+        uint64_t u = (uint64_t)std::fabs(x);
+        BigInt num = bigFromU64(u);
+        if (x < 0) num = -num;
+        std::string err;
+        return make(num, BigInt::fromInt64(1), out, err);
+    }
     int exp = 0;
     double m = std::frexp(x, &exp);           // x = m * 2^exp, 0.5 <= |m| < 1
     // scale mantissa to an integer: m * 2^53 is exact

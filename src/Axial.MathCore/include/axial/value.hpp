@@ -8,7 +8,7 @@
 
 namespace axial {
 
-enum class ValueKind { Rational, Real, Complex };
+enum class ValueKind { Rational, Integer, Real, Complex };
 
 struct Value {
     ValueKind kind = ValueKind::Real;
@@ -33,6 +33,12 @@ struct Value {
         r.kind = ValueKind::Complex;
         r.re = re;
         r.im = im;
+        return r;
+    }
+    static Value integer(double v) {
+        Value r;
+        r.kind = ValueKind::Integer;
+        r.re = v;
         return r;
     }
 

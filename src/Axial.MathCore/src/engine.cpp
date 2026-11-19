@@ -72,7 +72,7 @@ EvalResult engineEval(const std::string& src, const EvalOptions& opts) {
 
     res.ok = true;
     res.value = out;
-    res.exact = out.kind == ValueKind::Rational;
+    res.exact = out.kind == ValueKind::Rational || out.kind == ValueKind::Integer;
     res.text = valueToString(out);
     return res;
 }
@@ -118,6 +118,7 @@ std::string resultJson(const EvalResult& r) {
     s += ",\"approx\":" + numberToJson(r.value.toDouble());
     const char* kind = "real";
     if (r.value.kind == ValueKind::Rational) kind = "rational";
+    else if (r.value.kind == ValueKind::Integer) kind = "integer";
     else if (r.value.kind == ValueKind::Complex) kind = "complex";
     s += ",\"kind\":\"" + std::string(kind) + "\"";
     if (r.parensFixed > 0) {

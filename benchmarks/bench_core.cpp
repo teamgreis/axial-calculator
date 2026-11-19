@@ -107,6 +107,8 @@ int main() {
     }
 
     std::printf("benchmark,unit=ns_per_op\n");
+    std::printf("phase,parse,%.1f\n", nsPhaseParse("2+3*4", 100000));
+    std::printf("phase,parse_compile,%.1f\n", nsPhaseParseCompile("2+3*4", 100000));
     for (auto& c : cases) {
         double ns1 = nsPerOpEval(c.src, 200000);
         double ns2 = nsPerOpCompiled(c.src, 2000000,

@@ -73,8 +73,15 @@ jobs:
           cmake -S src/Axial.MathCore -B build-core -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build-core
 
-      - name: WinUI-App bauen
-        run: dotnet build src\Axial.App\Axial.App.csproj -c Release -p:Platform=x64 -p:AxialCoreDll=${{ github.workspace }}\build-core\axial_mathcore_dll.dll
+      - name: WinUI-App bauen (XamlIL-Details sichtbar)
+        shell: pwsh
+        run: |
+          dotnet build src\Axial.App\Axial.App.csproj -c Release -p:Platform=x64 -p:AxialCoreDll="${{ github.workspace }}\build-core\axial_mathcore_dll.dll" -v:detailed -bl:${{ runner.temp }}\xaml.binlog
+          if ($LASTEXITCODE -ne 0) {
+            $xaml = Get-ChildItem -Recurse src\Axial.App -Filter *.xaml | Resolve-Path -Relative
+            Write-Host "XAML-Dateien: $xaml"
+            exit $LASTEXITCODE
+          }
 
       - name: MSIX suchen
         shell: pwsh

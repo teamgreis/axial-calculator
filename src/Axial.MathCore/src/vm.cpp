@@ -500,8 +500,7 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
             return true;
         }
         if (fn == "sqrt") {
-            std::string msg;
-            Rational arg = a0.kind == SK_RAT ? a0.q : Rational::fromDouble(a0.d);
+            Rational arg = a0.toQ();
             if (arg.sign() >= 0) {
                 Rational root;
                 if (Rational::sqrtExact(arg, root)) {

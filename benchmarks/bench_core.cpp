@@ -43,10 +43,11 @@ double nsPerOpCompiled(const char* src, int iters, const EvalOptions& opts) {
     auto t0 = Clock::now();
     volatile double sink = 0.0;
     Value out;
+    AxialError e;
     for (int i = 0; i < iters; ++i) {
-        AxialError e;
         vmRun(prog, env, out, e);
-        sink += e.ok() ? out.toDouble() : 0.0;
+        // no toDouble conversion here: the VM is what is measured
+        sink += e.ok() ? ((out.kind == ValueKind::Rational) ? 1.0 : out.re) : 0.0;
     }
     auto t1 = Clock::now();
     (void)sink;

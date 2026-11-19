@@ -169,6 +169,8 @@ TEST(axial_fuzz_no_crash) {
         "2^999999", "1/0+1/0", "((1+2)*(3-4))^(1/2)",
     };
     for (const char* j : junk) {
+        std::printf("    fuzz-eval: %s\n", j);
+        std::fflush(stdout);
         EvalResult r = E(j);
         // Ergebnis muss wahlweise ok (mit Text) oder ein typisierter Fehler sein
         if (r.ok) {

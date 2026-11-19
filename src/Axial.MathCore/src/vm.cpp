@@ -118,6 +118,14 @@ bool fitsInt(double v) {
     return v >= -kIntLimit && v <= kIntLimit && std::floor(v) == v;
 }
 
+// exact conversion of an integral double to a fraction (for rare big results)
+Rational ratOf(double v) {
+    Rational r;
+    std::string err;
+    Rational::fromDouble(v, r);
+    return r;
+}
+
 // ------------------------------------------------------- slot arithmetic ops
 
 bool opAdd(const Slot& a, const Slot& b, Slot& out) {
@@ -551,7 +559,7 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
                 if (fitsInt(acc)) { out = Slot::IntD(acc); return true; }
                 std::string msg;
                 Rational r;
-                Rational::div(Rational::fromDouble(acc), Rational::one(), r, msg);
+                Rational::div(ratOf(acc), Rational::one(), r, msg);
                 out = Slot::Rat(r);
                 return true;
             }
@@ -574,7 +582,7 @@ bool callFunction(const std::string& fn, const Slot* args, size_t argc,
                 for (size_t i = 0; i < argc; ++i) acc += args[i].d;
                 std::string msg;
                 Rational r;
-                Rational::div(Rational::fromDouble(acc),
+                Rational::div(ratOf(acc),
                               Rational::fromInt64((int64_t)argc), r, msg);
                 if (r.isInteger() && fitsInt(r.toDouble())) {
                     out = Slot::IntD(r.toDouble());

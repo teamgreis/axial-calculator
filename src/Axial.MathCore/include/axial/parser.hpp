@@ -1,6 +1,7 @@
 // Axial Math Core — precedence parser
 #pragma once
 
+#include <deque>
 #include <string>
 
 #include "axial/ast.hpp"
@@ -9,10 +10,14 @@
 namespace axial {
 
 struct ParseResult {
-    NodePtr root;
+    NodePtr root = nullptr;
     AxialError err;
     int parensFixed = 0;    // number of automatically closed parentheses
     bool ok() const { return err.ok(); }
+
+    // Node storage (stable addresses). ParseResult is never copied: it is
+    // returned by value with guaranteed copy elision.
+    std::deque<Node> arena_;
 };
 
 class Parser {

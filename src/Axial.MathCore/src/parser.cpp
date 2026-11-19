@@ -14,11 +14,12 @@ const char* kConstants[] = {"pi", "e", "tau", "phi"};
 
 struct P {
     const std::vector<Token>& tk;
+    ParseResult& res;
     size_t pos = 0;
     int fixed = 0;
     AxialError err;
 
-    explicit P(const std::vector<Token>& t) : tk(t) {}
+    P(const std::vector<Token>& t, ParseResult& r) : tk(t), res(r) {}
 
     const Token& peek() const {
         // bounds-safe: the tokenizer always terminates with an End sentinel
@@ -49,8 +50,11 @@ struct P {
         }
     }
 
-    NodePtr make(NodeKind k, int pos) {
-        auto n = makeNode(k, pos);
+    Node* make(NodeKind k, int pos) {
+        res.arena_.emplace_back();
+        Node* n = &res.arena_.back();
+        n->kind = k;
+        n->pos = pos;
         return n;
     }
 
@@ -350,7 +354,7 @@ ParseResult Parser::parse(const std::string& src) {
         res.err = terr;
         return res;
     }
-    P parser(tokens);
+    P parser(tokens, res);
     NodePtr root = parser.expr();
     if (!root) {
         res.err = parser.err;

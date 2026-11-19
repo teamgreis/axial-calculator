@@ -1,7 +1,7 @@
 // Axial Math Core — abstract syntax tree
 #pragma once
 
-#include <memory>
+#include <deque>
 #include <string>
 #include <vector>
 
@@ -25,17 +25,10 @@ struct Node {
     int pos = -1;                 // source position (for error reports)
     Rational num;                 // when kind == Num
     std::string name;             // when kind == Const / Var / Call
-    std::vector<std::shared_ptr<Node>> kids;
+    std::vector<struct Node*> kids;
 };
 
-using NodePtr = std::shared_ptr<Node>;
-
-inline NodePtr makeNode(NodeKind k, int pos) {
-    auto n = std::make_shared<Node>();
-    n->kind = k;
-    n->pos = pos;
-    return n;
-}
+using NodePtr = Node*;
 
 // Normalized function names of the core library.
 bool isCoreFunction(const std::string& name);
